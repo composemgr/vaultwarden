@@ -1,0 +1,37 @@
+name: vaultwarden
+services:
+  app:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden-app
+    hostname: ${BASE_HOST_NAME:-vaultwarden}
+    restart: always
+    pull_policy: always
+    environment:
+      - DOMAIN=https://${BASE_HOST_NAME}
+      - SENDS_ALLOWED=true
+      - SIGNUPS_VERIFY=true
+      - SIGNUPS_ALLOWED=true
+      - TRASH_AUTO_DELETE_DAYS=30
+      - ORG_GROUPS_ENABLED=true
+      - ORG_EVENTS_ENABLED=true
+      - ORG_CREATION_USERS=all
+      - INVITATIONS_ALLOWED=true
+      - ADMIN_TOKEN=${APP_SECRET_TOKEN_64}
+      - SMTP_HOST=${EMAIL_SERVER_HOST}
+      - SMTP_FROM=no-reply@${BASE_HOST_NAME}
+      - SMTP_SECURITY=starttls
+      - SMTP_EMBED_IMAGES=true
+      - 'SMTP_FROM_NAME=CasjaysDev Vault'
+      - 'INVITATION_ORG_NAME=CasjaysDev Vault'
+      - 'EXPERIMENTAL_CLIENT_FEATURE_FLAGS=fido2-vault-credentials'
+    ports:
+      - 172.17.0.1:59090:80
+    volumes:
+      - /var/lib/srv/${USER}/docker/vaultwarden/server/latest/rootfs/data/vaultwarden:/data
+    networks:
+      - vaultwarden
+
+networks:
+  vaultwarden:
+    name: vaultwarden
+    external: false
