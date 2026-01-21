@@ -1,0 +1,48 @@
+# nginx proxy address - http://172.17.0.1:59090
+
+name: vaultwarden
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      DOMAIN: https://${BASE_HOST_NAME:-$HOSTNAME}
+      SENDS_ALLOWED: true
+      SIGNUPS_VERIFY: true
+      SIGNUPS_ALLOWED: true
+      TRASH_AUTO_DELETE_DAYS: 30
+      ORG_GROUPS_ENABLED: true
+      ORG_EVENTS_ENABLED: true
+      ORG_CREATION_USERS: all
+      INVITATIONS_ALLOWED: true
+      ADMIN_TOKEN: ${APP_SECRET_TOKEN_64:-changeme_admin_token}
+      SMTP_HOST: ${EMAIL_SERVER_HOST:-172.17.0.1}
+      SMTP_PORT: ${EMAIL_SERVER_PORT:-587}
+      SMTP_FROM: ${EMAIL_SERVER_MAIL_FROM:-no-reply@${BASE_DOMAIN_NAME:-${BASE_HOST_NAME}}}
+      SMTP_SECURITY: starttls
+      SMTP_EMBED_IMAGES: true
+      SMTP_FROM_NAME: ${EMAIL_SERVER_FROM_ORG:-vaultwarden}
+      INVITATION_ORG_NAME: ${APP_ORG_NAME:-vaultwarden}
+      EXPERIMENTAL_CLIENT_FEATURE_FLAGS: fido2-vault-credentials
+    ports:
+      - 172.17.0.1:59090:80
+    volumes:
+      - './rootfs/data/vaultwarden:/data'
+    networks:
+      - vaultwarden
+
+networks:
+  vaultwarden:
+    name: vaultwarden
+    external: false
