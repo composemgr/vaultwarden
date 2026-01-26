@@ -1,31 +1,31 @@
 ## 👋 Welcome to vaultwarden 🚀
 
-Vaultwarden - Unofficial Bitwarden compatible password manager server
+Unofficial Bitwarden server written in Rust
 
 ## 📋 Description
 
-Vaultwarden is an alternative implementation of the Bitwarden server API written in Rust. Lightweight, fast, and compatible with all official Bitwarden clients (mobile, desktop, browser extensions).
+Unofficial Bitwarden server written in Rust
 
 ## 🚀 Services
 
-- **app**: Vaultwarden server (`vaultwarden/server:latest`)
+- **app**: vaultwarden/server:latest
 
 ## 📦 Installation
 
-### Using curl
-```shell
-curl -q -LSsf "https://raw.githubusercontent.com/composemgr/vaultwarden/main/docker-compose.yaml" | docker compose -f - up -d
+### Option 1: Quick Install
+```bash
+curl -q -LSsf "https://raw.githubusercontent.com/composemgr/vaultwarden/main/docker-compose.yaml" -o compose.yml
 ```
 
-### Using git
-```shell
+### Option 2: Git Clone
+```bash
 git clone "https://github.com/composemgr/vaultwarden" ~/.local/srv/docker/vaultwarden
 cd ~/.local/srv/docker/vaultwarden
 docker compose up -d
 ```
 
-### Using composemgr
-```shell
+### Option 3: Using composemgr
+```bash
 composemgr install vaultwarden
 ```
 
@@ -34,50 +34,32 @@ composemgr install vaultwarden
 ### Environment Variables
 
 ```shell
-# Core Settings
 TZ=America/New_York
-DOMAIN=https://${BASE_HOST_NAME}
-
-# Features
-SENDS_ALLOWED=true
-SIGNUPS_ALLOWED=false              # Disable after creating accounts
-SIGNUPS_VERIFY=true
-INVITATIONS_ALLOWED=true
-TRASH_AUTO_DELETE_DAYS=30
-ORG_GROUPS_ENABLED=true
-ORG_EVENTS_ENABLED=true
-ORG_CREATION_USERS=all
-
-# Admin Panel
-ADMIN_TOKEN=changeme_admin_token    # Generate with: openssl rand -base64 48
-
-# SMTP
-SMTP_HOST=172.17.0.1
-SMTP_PORT=587
-SMTP_FROM=vaultwarden@${BASE_DOMAIN_NAME}
-SMTP_SECURITY=starttls
-SMTP_FROM_NAME=Vaultwarden
-INVITATION_ORG_NAME=Vaultwarden
+APP_SECRET_TOKEN_64=changeme_admin_token
+EMAIL_SERVER_HOST=172.17.0.1
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_MAIL_FROM=no-reply@${BASE_DOMAIN_NAME:-${BASE_HOST_NAME
+EMAIL_SERVER_FROM_ORG=vaultwarden
+APP_ORG_NAME=vaultwarden
 ```
+
+See `docker-compose.yaml` for complete list of configurable options.
 
 ## 🌐 Access
 
-- **Web Vault**: http://172.17.0.1:59090
-- **Admin Panel**: http://172.17.0.1:59090/admin
-- **Must use HTTPS** in production (reverse proxy required)
+- **Web Interface**: http://172.17.0.1:59090
 
 ## 📂 Volumes
 
-- `./rootfs/data/vaultwarden` - Database and attachments
+- `./rootfs/data/vaultwarden` - Data storage
 
 ## 🔐 Security
 
-- **HTTPS required**: Clients won't connect without valid TLS
-- **Disable signups**: After creating accounts
-- **Strong admin token**: Use `openssl rand -base64 48`
-- **Enable 2FA**: For all accounts
-- **Email verification**: Configure SMTP
-- **Regular backups**: Critical for password data
+- Change all default passwords before deploying to production
+- Use strong secrets for all authentication tokens
+- Configure HTTPS using a reverse proxy (nginx, traefik, caddy)
+- Regularly update Docker images for security patches
+- Backup your data regularly
 
 ## 🔍 Logging
 
@@ -87,25 +69,27 @@ docker compose logs -f app
 
 ## 🛠️ Management
 
-```shell
+```bash
+# Start services
 docker compose up -d
+
+# Stop services
 docker compose down
+
+# Update to latest images
 docker compose pull && docker compose up -d
-```
 
-## 🔄 Backup
+# View logs
+docker compose logs -f
 
-```shell
-# Backup data directory (includes SQLite DB)
-tar -czf vaultwarden-backup-$(date +%Y%m%d).tar.gz rootfs/data/vaultwarden
+# Restart services
+docker compose restart
 ```
 
 ## 📋 Requirements
 
 - Docker Engine 20.10+
 - Docker Compose V2+
-- **HTTPS reverse proxy** (required for clients)
-- Valid TLS certificate
 
 ## 🤝 Author
 
