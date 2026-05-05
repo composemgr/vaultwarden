@@ -38,7 +38,7 @@ services:
     ports:
       - 172.17.0.1:59090:80
     volumes:
-      - './rootfs/data/vaultwarden:/data'
+      - './volumes/data/vaultwarden:/data'
     networks:
       - vaultwarden
 
