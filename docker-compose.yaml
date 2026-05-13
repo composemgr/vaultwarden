@@ -17,6 +17,8 @@ services:
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: vaultwarden-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
       DOMAIN: https://${BASE_HOST_NAME:-$HOSTNAME}.${BASE_DOMAIN_NAME:-example.com}
       SENDS_ALLOWED: true
       SIGNUPS_VERIFY: true
@@ -41,8 +43,30 @@ services:
       - './volumes/data/vaultwarden:/data'
     networks:
       - vaultwarden
+      - proxy
+      - cloudflare
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://vaultwarden-app:80'
+      - 'cloudflare.hostname=vaultwarden.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.vaultwarden-app.entrypoints=http'
+      - 'traefik.http.routers.vaultwarden-app-secure.tls=true'
+      - 'traefik.http.routers.vaultwarden-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.vaultwarden-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.vaultwarden-app.middlewares=vaultwarden-app-https-redirect'
+      - 'traefik.http.routers.vaultwarden-app-secure.entrypoints=https'
+      - 'traefik.http.routers.vaultwarden-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.vaultwarden-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.vaultwarden-app-secure.service=vaultwarden-app'
+      - 'traefik.http.services.vaultwarden-app.loadbalancer.server.port=80'
 
 networks:
   vaultwarden:
     name: vaultwarden
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
