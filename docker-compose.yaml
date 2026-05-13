@@ -17,7 +17,7 @@ services:
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
-      DOMAIN: https://${BASE_HOST_NAME:-$HOSTNAME}
+      DOMAIN: https://${BASE_HOST_NAME:-$HOSTNAME}.${BASE_DOMAIN_NAME:-example.com}
       SENDS_ALLOWED: true
       SIGNUPS_VERIFY: true
       SIGNUPS_ALLOWED: true
@@ -26,13 +26,13 @@ services:
       ORG_EVENTS_ENABLED: true
       ORG_CREATION_USERS: all
       INVITATIONS_ALLOWED: true
-      ADMIN_TOKEN: ${APP_SECRET_TOKEN_64:-changeme_admin_token}
+      ADMIN_TOKEN: ${APP_SECRET_KEY:-changeme_secret_key_min_32_chars}
       SMTP_HOST: ${EMAIL_SERVER_HOST:-172.17.0.1}
       SMTP_PORT: ${EMAIL_SERVER_PORT:-587}
-      SMTP_FROM: ${EMAIL_SERVER_MAIL_FROM:-no-reply@${BASE_DOMAIN_NAME:-${BASE_HOST_NAME}}}
+      SMTP_FROM: ${EMAIL_SERVER_MAIL_FROM:-noreply@example.com}
       SMTP_SECURITY: starttls
       SMTP_EMBED_IMAGES: true
-      SMTP_FROM_NAME: ${EMAIL_SERVER_FROM_ORG:-vaultwarden}
+      SMTP_FROM_NAME: ${APP_ORG_NAME:-vaultwarden}
       INVITATION_ORG_NAME: ${APP_ORG_NAME:-vaultwarden}
       EXPERIMENTAL_CLIENT_FEATURE_FLAGS: fido2-vault-credentials
     ports:
