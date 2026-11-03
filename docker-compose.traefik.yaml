@@ -33,6 +33,12 @@ services:
       SMTP_FROM_NAME: ${APP_ORG_NAME:-Vaultwarden}
       SMTP_SECURITY: starttls
       SMTP_EMBED_IMAGES: true
+    healthcheck:
+      test: ['CMD', '/healthcheck.sh']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     volumes:
       - './volumes/data/vaultwarden:/data:z'
     labels:
